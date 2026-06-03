@@ -17,11 +17,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Serve frontend static files
-frontend_dist = Path(__file__).parent / "frontend" / "dist"
-if frontend_dist.exists():
-    app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="static")
-
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
@@ -31,7 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include order routes
+# Include order routes FIRST
 app.include_router(routes.router)
 
 # Test endpoint
@@ -49,6 +44,13 @@ async def root():
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy"}
+
+# Serve frontend static files LAST (catches everything else)
+frontend_dist = Path(__file__).parent / "frontend" / "dist"
+if frontend_dist.exists():
+    app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="static")
+else:
+    print(f"⚠️  Frontend dist folder not found at {frontend_dist}")
 
 if __name__ == "__main__":
     uvicorn.run(
