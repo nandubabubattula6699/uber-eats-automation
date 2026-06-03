@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 import uvicorn
 from database import Base, engine
 from app.routes import routes
@@ -15,6 +17,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
+# Serve frontend static files
+frontend_dist = Path(__file__).parent / "frontend" / "dist"
+if frontend_dist.exists():
+    app.mount("/", StaticFiles(directory=str(frontend_dist), html=True), name="static")
+
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
@@ -28,7 +35,7 @@ app.add_middleware(
 app.include_router(routes.router)
 
 # Test endpoint
-@app.get("/")
+@app.get("/api")
 async def root():
     return {
         "message": "Uber Eats Order Automation Backend",
