@@ -1,0 +1,12 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+orders.db
+*.db
+.DS_Store
+Thumbs.db
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
