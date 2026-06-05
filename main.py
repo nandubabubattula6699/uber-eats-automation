@@ -5,6 +5,7 @@ from pathlib import Path
 import uvicorn
 from database import Base, engine
 from app.routes import routes
+from app.routes import webhook
 from config import settings
 
 # Create all database tables
@@ -26,8 +27,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include order routes FIRST
+# Include routers FIRST
 app.include_router(routes.router)
+app.include_router(webhook.router)
 
 # Test endpoint
 @app.get("/api")
