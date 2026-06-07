@@ -59,7 +59,7 @@ export default function App() {
 
   const fetchOrders = useCallback(async () => {
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/orders/')
+      const res = await fetch('/api/orders/')
       const data = await res.json()
       setOrders(data.orders || [])
       setError(null)
@@ -80,7 +80,7 @@ export default function App() {
 
   const updateStatus = async (orderId, newStatus) => {
     try {
-      await fetch(`http://127.0.0.1:8000/api/orders/${orderId}`, {
+      await fetch(`/api/orders/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus }),
