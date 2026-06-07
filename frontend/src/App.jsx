@@ -60,6 +60,7 @@ export default function App() {
   const fetchOrders = useCallback(async () => {
     try {
       const res = await fetch('/api/orders/')
+      if (!res.ok) throw new Error(`Server error ${res.status}`)
       const data = await res.json()
       setOrders(data.orders || [])
       setError(null)

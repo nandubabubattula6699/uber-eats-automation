@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from typing import Optional
 from datetime import datetime
 
@@ -29,12 +29,12 @@ class OrderResponseSchema(BaseModel):
     special_requests: Optional[str]
     status: str
     is_confirmed: bool
+    total_amount: Optional[float]
     prep_time: int
     created_at: datetime
     confirmed_at: Optional[datetime]
-    
-    class Config:
-        from_orm = True  # For SQLAlchemy compatibility
+
+    model_config = ConfigDict(from_attributes=True)
 
 class OrderUpdateSchema(BaseModel):
     """Schema for updating order status"""
@@ -46,5 +46,4 @@ class OrderListResponseSchema(BaseModel):
     total: int
     orders: list[OrderResponseSchema]
 
-    class Config:
-        from_orm = True
+    model_config = ConfigDict(from_attributes=True)
