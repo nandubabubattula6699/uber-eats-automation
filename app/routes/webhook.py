@@ -38,8 +38,8 @@ async def receive_order(request: Request, db: Session = Depends(get_db)):
     if "order" not in event_type.lower():
         return {"status": "ignored", "event": event_type}
 
-    # Per Uber docs: resource_id = order_id, resource_href = URL to fetch full order
-    order_id      = payload.get("resource_id", "")
+    # Per Uber docs: resource_id is inside meta{}, resource_href is top level
+    order_id      = payload.get("meta", {}).get("resource_id", "")
     resource_href = payload.get("resource_href", "")
 
     if not order_id:

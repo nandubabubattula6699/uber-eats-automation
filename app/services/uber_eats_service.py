@@ -52,7 +52,7 @@ async def accept_uber_order(order_id: str) -> bool:
         token = await get_access_token()
         async with httpx.AsyncClient() as client:
             resp = await client.post(
-                f"{UBER_API_BASE}/v1/delivery/orders/{order_id}/accept_pos_order",
+                f"{UBER_API_BASE}/v1/delivery/order/{order_id}/accept",
                 headers={"Authorization": f"Bearer {token}"},
                 json={},
             )
