@@ -105,7 +105,10 @@ export default function App() {
 
   const timeAgo = (dateStr) => {
     if (!dateStr) return '—'
-    const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000)
+    // Railway stores naive UTC datetimes; append 'Z' so JS parses them as UTC
+    const normalized = /[Z+]/.test(dateStr) ? dateStr : dateStr + 'Z'
+    const diff = Math.floor((Date.now() - new Date(normalized)) / 1000)
+    if (diff < 0)    return 'just now'
     if (diff < 60)   return `${diff}s ago`
     if (diff < 3600) return `${Math.floor(diff / 60)}m ago`
     return `${Math.floor(diff / 3600)}h ago`
@@ -321,7 +324,7 @@ export default function App() {
                         </div>
                         <p className="text-xs text-[#7d8590] truncate">
                           {items.length > 0
-                            ? items.map(i => `${i.name || i.item_name} ×${i.qty || i.quantity}`).join('  ·  ')
+                            ? items.map(i => `${i.title || i.name || i.item_name || 'Item'} ×${typeof i.quantity === 'number' ? i.quantity : (i.qty || 1)}`).join('  ·  ')
                             : order.items}
                         </p>
                         <p className="text-xs text-[#7d8590] mt-1">
@@ -378,9 +381,9 @@ export default function App() {
                             <div className="space-y-2">
                               {items.length > 0 ? items.map((item, i) => (
                                 <div key={i} className="flex items-center justify-between">
-                                  <span className="text-sm text-[#e6edf3]">{item.name || item.item_name}</span>
+                                  <span className="text-sm text-[#e6edf3]">{item.title || item.name || item.item_name || 'Item'}</span>
                                   <div className="flex items-center gap-4 text-sm text-[#7d8590]">
-                                    <span>×{item.qty || item.quantity}</span>
+                                    <span>×{typeof item.quantity === 'number' ? item.quantity : (item.qty || 1)}</span>
                                     {item.price && <span className="tabular-nums">${item.price}</span>}
                                   </div>
                                 </div>
