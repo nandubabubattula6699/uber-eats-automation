@@ -47,6 +47,35 @@ async def get_order_details(resource_href: str) -> dict:
         print(f"[Uber] Failed to fetch order details from {resource_href}: {e}")
         return {}
 
+async def enable_store_webhooks() -> bool:
+    """Enable all order webhook types on the store via PATCH /pos_data.
+    Uber resets these to false on first provisioning; we call this once at startup."""
+    store_id = os.getenv("UBER_RESTAURANT_UUID", "")
+    if not store_id:
+        print("[Uber] No UBER_RESTAURANT_UUID — skipping webhook enable")
+        return False
+    try:
+        token = await get_access_token()
+        async with httpx.AsyncClient() as client:
+            resp = await client.patch(
+                f"{UBER_API_BASE}/v1/eats/stores/{store_id}/pos_data",
+                headers={"Authorization": f"Bearer {token}"},
+                json={
+                    "webhooks_config": {
+                        "webhooks_version": "0.1",
+                        "schedule_order_webhooks":  {"is_enabled": True},
+                        "order_release_webhooks":   {"is_enabled": True},
+                        "delivery_status_webhooks": {"is_enabled": True},
+                    }
+                },
+            )
+            print(f"[Uber] Store webhook enable: {resp.status_code}")
+            return resp.status_code in (200, 204)
+    except Exception as e:
+        print(f"[Uber] Failed to enable store webhooks: {e}")
+        return False
+
+
 async def accept_uber_order(order_id: str) -> bool:
     try:
         token = await get_access_token()
